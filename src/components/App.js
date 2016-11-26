@@ -17,6 +17,9 @@ export default class App extends preact.Component {
             "Syncing Redux Stores across Browser Tabs"
           </a> (Medium)
         </p>
+        <p>
+          <i>Just open the website twice, so that you can see both windows and play around.</i>
+        </p>
         <hr/>
         <div className="parts">
           <section>
