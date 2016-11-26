@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>redux-tab-sync</title>
+    <link rel="shortcut icon" href="http://redux.js.org/gitbook/images/favicon.ico" type="image/x-icon"/>
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.28.0/mapbox-gl.css' rel='stylesheet' />
+    <style>
+      html {
+        font-family: Roboto, sans-serif;
+      }
+
+      input[type="range"],
+      input[type="text"]
+       {
+        width: 300px;
+      }
+
+      p, h1, h2 {
+        text-align: center;
+      }
+
+      hr {
+        border: none;
+        height: 1px;
+        background-color: #aaa;
+        width: 80%;
+      }
+
+      .map {
+        position:absolute;
+        top:0;
+        bottom:0;
+        width:100%;
+      }
+
+      .parts {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+    </div>
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.28.0/mapbox-gl.js'></script>
+    <script src="build/bundle.js"></script>
+  </body>
+</html>
