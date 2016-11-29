@@ -973,7 +973,7 @@ return lib;
 })));
 
 
-},{"preact":12,"redux":19}],12:[function(require,module,exports){
+},{"preact":12,"redux":18}],12:[function(require,module,exports){
 !function(global, factory) {
     'object' == typeof exports && 'undefined' != typeof module ? factory(exports) : 'function' == typeof define && define.amd ? define([ 'exports' ], factory) : factory(global.preact = global.preact || {});
 }(this, function(exports) {
@@ -1454,188 +1454,6 @@ return lib;
 });
 
 },{}],13:[function(require,module,exports){
-// shim for using process in browser
-var process = module.exports = {};
-
-// cached from whatever global is present so that test runners that stub it
-// don't break things.  But we need to wrap it in a try catch in case it is
-// wrapped in strict mode code which doesn't define any globals.  It's inside a
-// function because try/catches deoptimize in certain engines.
-
-var cachedSetTimeout;
-var cachedClearTimeout;
-
-function defaultSetTimout() {
-    throw new Error('setTimeout has not been defined');
-}
-function defaultClearTimeout () {
-    throw new Error('clearTimeout has not been defined');
-}
-(function () {
-    try {
-        if (typeof setTimeout === 'function') {
-            cachedSetTimeout = setTimeout;
-        } else {
-            cachedSetTimeout = defaultSetTimout;
-        }
-    } catch (e) {
-        cachedSetTimeout = defaultSetTimout;
-    }
-    try {
-        if (typeof clearTimeout === 'function') {
-            cachedClearTimeout = clearTimeout;
-        } else {
-            cachedClearTimeout = defaultClearTimeout;
-        }
-    } catch (e) {
-        cachedClearTimeout = defaultClearTimeout;
-    }
-} ())
-function runTimeout(fun) {
-    if (cachedSetTimeout === setTimeout) {
-        //normal enviroments in sane situations
-        return setTimeout(fun, 0);
-    }
-    // if setTimeout wasn't available but was latter defined
-    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-        cachedSetTimeout = setTimeout;
-        return setTimeout(fun, 0);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedSetTimeout(fun, 0);
-    } catch(e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-            return cachedSetTimeout.call(null, fun, 0);
-        } catch(e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-            return cachedSetTimeout.call(this, fun, 0);
-        }
-    }
-
-
-}
-function runClearTimeout(marker) {
-    if (cachedClearTimeout === clearTimeout) {
-        //normal enviroments in sane situations
-        return clearTimeout(marker);
-    }
-    // if clearTimeout wasn't available but was latter defined
-    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-        cachedClearTimeout = clearTimeout;
-        return clearTimeout(marker);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedClearTimeout(marker);
-    } catch (e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-            return cachedClearTimeout.call(null, marker);
-        } catch (e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-            return cachedClearTimeout.call(this, marker);
-        }
-    }
-
-
-
-}
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
-
-function cleanUpNextTick() {
-    if (!draining || !currentQueue) {
-        return;
-    }
-    draining = false;
-    if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
-    } else {
-        queueIndex = -1;
-    }
-    if (queue.length) {
-        drainQueue();
-    }
-}
-
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    var timeout = runTimeout(cleanUpNextTick);
-    draining = true;
-
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        while (++queueIndex < len) {
-            if (currentQueue) {
-                currentQueue[queueIndex].run();
-            }
-        }
-        queueIndex = -1;
-        len = queue.length;
-    }
-    currentQueue = null;
-    draining = false;
-    runClearTimeout(timeout);
-}
-
-process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-        for (var i = 1; i < arguments.length; i++) {
-            args[i - 1] = arguments[i];
-        }
-    }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
-        runTimeout(drainQueue);
-    }
-};
-
-// v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
-}
-Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
-};
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
-
-},{}],14:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -1694,7 +1512,7 @@ function applyMiddleware() {
     };
   };
 }
-},{"./compose":17}],15:[function(require,module,exports){
+},{"./compose":16}],14:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -1746,7 +1564,7 @@ function bindActionCreators(actionCreators, dispatch) {
   }
   return boundActionCreators;
 }
-},{}],16:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -1891,7 +1709,7 @@ function combineReducers(reducers) {
   };
 }
 }).call(this,require('_process'))
-},{"./createStore":18,"./utils/warning":20,"_process":13,"lodash/isPlainObject":10}],17:[function(require,module,exports){
+},{"./createStore":17,"./utils/warning":19,"_process":36,"lodash/isPlainObject":10}],16:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -1930,7 +1748,7 @@ function compose() {
     }, last.apply(undefined, arguments));
   };
 }
-},{}],18:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2192,7 +2010,7 @@ function createStore(reducer, preloadedState, enhancer) {
     replaceReducer: replaceReducer
   }, _ref2[_symbolObservable2['default']] = observable, _ref2;
 }
-},{"lodash/isPlainObject":10,"symbol-observable":21}],19:[function(require,module,exports){
+},{"lodash/isPlainObject":10,"symbol-observable":20}],18:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -2241,7 +2059,7 @@ exports.bindActionCreators = _bindActionCreators2['default'];
 exports.applyMiddleware = _applyMiddleware2['default'];
 exports.compose = _compose2['default'];
 }).call(this,require('_process'))
-},{"./applyMiddleware":14,"./bindActionCreators":15,"./combineReducers":16,"./compose":17,"./createStore":18,"./utils/warning":20,"_process":13}],20:[function(require,module,exports){
+},{"./applyMiddleware":13,"./bindActionCreators":14,"./combineReducers":15,"./compose":16,"./createStore":17,"./utils/warning":19,"_process":36}],19:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2267,10 +2085,10 @@ function warning(message) {
   } catch (e) {}
   /* eslint-enable no-empty */
 }
-},{}],21:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 module.exports = require('./lib/index');
 
-},{"./lib/index":22}],22:[function(require,module,exports){
+},{"./lib/index":21}],21:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -2302,7 +2120,7 @@ if (typeof self !== 'undefined') {
 var result = (0, _ponyfill2['default'])(root);
 exports['default'] = result;
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./ponyfill":23}],23:[function(require,module,exports){
+},{"./ponyfill":22}],22:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2326,37 +2144,913 @@ function symbolObservablePonyfill(root) {
 
 	return result;
 };
-},{}],24:[function(require,module,exports){
-"use strict";function _interopRequireDefault(e){return e&&e.__esModule?e:{default:e}}function _classCallCheck(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}function _possibleConstructorReturn(e,t){if(!e)throw new ReferenceError("this hasn't been initialised - super() hasn't been called");return!t||"object"!=typeof t&&"function"!=typeof t?e:t}function _inherits(e,t){if("function"!=typeof t&&null!==t)throw new TypeError("Super expression must either be null or a function, not "+typeof t);e.prototype=Object.create(t&&t.prototype,{constructor:{value:e,enumerable:!1,writable:!0,configurable:!0}}),t&&(Object.setPrototypeOf?Object.setPrototypeOf(e,t):e.__proto__=t)}Object.defineProperty(exports,"__esModule",{value:!0});var _createClass=function(){function e(e,t){for(var r=0;r<t.length;r++){var a=t[r];a.enumerable=a.enumerable||!1,a.configurable=!0,"value"in a&&(a.writable=!0),Object.defineProperty(e,a.key,a)}}return function(t,r,a){return r&&e(t.prototype,r),a&&e(t,a),t}}(),_preact=require("preact"),_preact2=_interopRequireDefault(_preact),_Map=require("./Map"),_Map2=_interopRequireDefault(_Map),_Slider=require("./Slider"),_Slider2=_interopRequireDefault(_Slider),_Text=require("./Text"),_Text2=_interopRequireDefault(_Text),article="https://medium.com/@Scarysize/syncing-redux-stores-across-browser-tabs-fff04f975423#.ipvddmb73",App=function(e){function t(){return _classCallCheck(this,t),_possibleConstructorReturn(this,(t.__proto__||Object.getPrototypeOf(t)).apply(this,arguments))}return _inherits(t,e),_createClass(t,[{key:"render",value:function(){return _preact2.default.h("div",null,_preact2.default.h("h1",null,"Redux Tab Sync"),_preact2.default.h("p",null,"This is a example built for ",_preact2.default.h("a",{href:article,target:"_blank"},'"Syncing Redux Stores across Browser Tabs"')," (Medium)"),_preact2.default.h("p",null,_preact2.default.h("i",null,"Just open the website twice, so that you can see both windows and play around.")),_preact2.default.h("hr",null),_preact2.default.h("div",{className:"parts"},_preact2.default.h("section",null,_preact2.default.h("h2",null,"Drag this"),_preact2.default.h(_Slider2.default,null)),_preact2.default.h("section",null,_preact2.default.h("h2",null,"Type something"),_preact2.default.h(_Text2.default,null)),_preact2.default.h("section",null,_preact2.default.h("h2",null,"Pan & Zoom"),_preact2.default.h(_Map2.default,null))))}}]),t}(_preact2.default.Component);exports.default=App;
+},{}],23:[function(require,module,exports){
+'use strict';
 
-},{"./Map":25,"./Slider":26,"./Text":27,"preact":12}],25:[function(require,module,exports){
-"use strict";function _interopRequireDefault(e){return e&&e.__esModule?e:{default:e}}function _classCallCheck(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}function _possibleConstructorReturn(e,t){if(!e)throw new ReferenceError("this hasn't been initialised - super() hasn't been called");return!t||"object"!=typeof t&&"function"!=typeof t?e:t}function _inherits(e,t){if("function"!=typeof t&&null!==t)throw new TypeError("Super expression must either be null or a function, not "+typeof t);e.prototype=Object.create(t&&t.prototype,{constructor:{value:e,enumerable:!1,writable:!0,configurable:!0}}),t&&(Object.setPrototypeOf?Object.setPrototypeOf(e,t):e.__proto__=t)}Object.defineProperty(exports,"__esModule",{value:!0});var _createClass=function(){function e(e,t){for(var r=0;r<t.length;r++){var n=t[r];n.enumerable=n.enumerable||!1,n.configurable=!0,"value"in n&&(n.writable=!0),Object.defineProperty(e,n.key,n)}}return function(t,r,n){return r&&e(t.prototype,r),n&&e(t,n),t}}(),_preact=require("preact"),_preact2=_interopRequireDefault(_preact),_preactRedux=require("preact-redux"),_map=require("../ducks/map"),accessToken="pk.eyJ1Ijoic2NhcnlzaXplIiwiYSI6ImNpcjR2ZWs4ODAwNDZoc25xMmRzM2JlcnQifQ.XmRVjMqDm9jUWw3eMYrrUw";window.mapboxgl.accessToken=accessToken;var Map=function(e){function t(){return _classCallCheck(this,t),_possibleConstructorReturn(this,(t.__proto__||Object.getPrototypeOf(t)).apply(this,arguments))}return _inherits(t,e),_createClass(t,[{key:"init",value:function(e){var t=this;e&&!this.initialized&&(this.initialized=!0,this.map=new mapboxgl.Map({container:e,style:"mapbox://styles/mapbox/streets-v9",center:this.props.center,zoom:this.props.zoom}),this.map.on("move",function(){t.props.dispatch((0,_map.updateMap)(t.map.getCenter(),t.map.getZoom()))}))}},{key:"componentWillReceiveProps",value:function(e){var t=e.center,r=e.zoom;this.map.setCenter(t),this.map.setZoom(r)}},{key:"shouldComponentUpdate",value:function(){return!this.initialized}},{key:"render",value:function(e){var t=this;return _preact2.default.h("div",{style:{position:"relative",height:300,width:300}},_preact2.default.h("div",{className:"map",ref:function(e){return t.init(e)}}))}}]),t}(_preact2.default.Component);exports.default=(0,_preactRedux.connect)(function(e){var t=e.map;return{center:t.center,zoom:t.zoom}})(Map);
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
-},{"../ducks/map":28,"preact":12,"preact-redux":11}],26:[function(require,module,exports){
-"use strict";function _interopRequireDefault(e){return e&&e.__esModule?e:{default:e}}function _classCallCheck(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}function _possibleConstructorReturn(e,t){if(!e)throw new ReferenceError("this hasn't been initialised - super() hasn't been called");return!t||"object"!=typeof t&&"function"!=typeof t?e:t}function _inherits(e,t){if("function"!=typeof t&&null!==t)throw new TypeError("Super expression must either be null or a function, not "+typeof t);e.prototype=Object.create(t&&t.prototype,{constructor:{value:e,enumerable:!1,writable:!0,configurable:!0}}),t&&(Object.setPrototypeOf?Object.setPrototypeOf(e,t):e.__proto__=t)}Object.defineProperty(exports,"__esModule",{value:!0});var _createClass=function(){function e(e,t){for(var r=0;r<t.length;r++){var n=t[r];n.enumerable=n.enumerable||!1,n.configurable=!0,"value"in n&&(n.writable=!0),Object.defineProperty(e,n.key,n)}}return function(t,r,n){return r&&e(t.prototype,r),n&&e(t,n),t}}(),_preact=require("preact"),_preact2=_interopRequireDefault(_preact),_preactRedux=require("preact-redux"),_slider=require("../ducks/slider"),Slider=function(e){function t(){return _classCallCheck(this,t),_possibleConstructorReturn(this,(t.__proto__||Object.getPrototypeOf(t)).apply(this,arguments))}return _inherits(t,e),_createClass(t,[{key:"onChange",value:function(e){var t=e.target.value;this.props.dispatch((0,_slider.updateSlider)(t))}},{key:"render",value:function(e){var t=this;return _preact2.default.h("div",null,_preact2.default.h("input",{max:"100",min:"0",onInput:function(e){return t.onChange(e)},type:"range",value:e.value}),_preact2.default.h("div",{style:{textAlign:"center"}},e.value))}}]),t}(_preact2.default.Component);exports.default=(0,_preactRedux.connect)(function(e){var t=e.slider;return{value:t}})(Slider);
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-},{"../ducks/slider":29,"preact":12,"preact-redux":11}],27:[function(require,module,exports){
-"use strict";function _interopRequireDefault(e){return e&&e.__esModule?e:{default:e}}function _classCallCheck(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}function _possibleConstructorReturn(e,t){if(!e)throw new ReferenceError("this hasn't been initialised - super() hasn't been called");return!t||"object"!=typeof t&&"function"!=typeof t?e:t}function _inherits(e,t){if("function"!=typeof t&&null!==t)throw new TypeError("Super expression must either be null or a function, not "+typeof t);e.prototype=Object.create(t&&t.prototype,{constructor:{value:e,enumerable:!1,writable:!0,configurable:!0}}),t&&(Object.setPrototypeOf?Object.setPrototypeOf(e,t):e.__proto__=t)}Object.defineProperty(exports,"__esModule",{value:!0});var _createClass=function(){function e(e,t){for(var r=0;r<t.length;r++){var n=t[r];n.enumerable=n.enumerable||!1,n.configurable=!0,"value"in n&&(n.writable=!0),Object.defineProperty(e,n.key,n)}}return function(t,r,n){return r&&e(t.prototype,r),n&&e(t,n),t}}(),_preact=require("preact"),_preact2=_interopRequireDefault(_preact),_preactRedux=require("preact-redux"),_text=require("../ducks/text"),Text=function(e){function t(){return _classCallCheck(this,t),_possibleConstructorReturn(this,(t.__proto__||Object.getPrototypeOf(t)).apply(this,arguments))}return _inherits(t,e),_createClass(t,[{key:"onChange",value:function(e){var t=e.target.value;this.props.dispatch((0,_text.updateText)(t))}},{key:"render",value:function(e){var t=this;return _preact2.default.h("div",null,_preact2.default.h("input",{onInput:function(e){return t.onChange(e)},type:"text",value:e.value}))}}]),t}(_preact2.default.Component);exports.default=(0,_preactRedux.connect)(function(e){var t=e.text;return{value:t}})(Text);
+var _preact = require('preact');
 
-},{"../ducks/text":30,"preact":12,"preact-redux":11}],28:[function(require,module,exports){
-"use strict";function reducer(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:initialState,t=arguments.length>1&&void 0!==arguments[1]?arguments[1]:{};return t.type===UPDATE?Object.assign({},e,{center:t.center,zoom:t.zoom}):e}function updateMap(e,t){return{type:UPDATE,center:e,zoom:t}}Object.defineProperty(exports,"__esModule",{value:!0}),exports.default=reducer,exports.updateMap=updateMap;var UPDATE="map/UPDATE",initialState={center:[29.688329407426636,51.01026517655359],zoom:1};
+var _preact2 = _interopRequireDefault(_preact);
+
+var _Cursor = require('./Cursor');
+
+var _Cursor2 = _interopRequireDefault(_Cursor);
+
+var _Map = require('./Map');
+
+var _Map2 = _interopRequireDefault(_Map);
+
+var _Slider = require('./Slider');
+
+var _Slider2 = _interopRequireDefault(_Slider);
+
+var _Text = require('./Text');
+
+var _Text2 = _interopRequireDefault(_Text);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var article = "https://medium.com/@Scarysize/syncing-redux-stores-across-browser-tabs-fff04f975423#.ipvddmb73";
+
+var App = function (_preact$Component) {
+  _inherits(App, _preact$Component);
+
+  function App() {
+    _classCallCheck(this, App);
+
+    return _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).apply(this, arguments));
+  }
+
+  _createClass(App, [{
+    key: 'render',
+    value: function render() {
+      return _preact2.default.h(
+        'div',
+        null,
+        _preact2.default.h(
+          'h1',
+          null,
+          'Redux Tab Sync'
+        ),
+        _preact2.default.h(
+          'p',
+          null,
+          'This is a example built for\xA0',
+          _preact2.default.h(
+            'a',
+            { href: article, target: '_blank' },
+            '"Syncing Redux Stores across Browser Tabs"'
+          ),
+          ' (Medium)'
+        ),
+        _preact2.default.h(
+          'p',
+          null,
+          _preact2.default.h(
+            'i',
+            null,
+            'Just open the website twice, so that you can see both windows and play around.'
+          )
+        ),
+        _preact2.default.h('hr', null),
+        _preact2.default.h(
+          'div',
+          { className: 'parts' },
+          _preact2.default.h(
+            'section',
+            null,
+            _preact2.default.h(
+              'h2',
+              null,
+              'Drag this'
+            ),
+            _preact2.default.h(_Slider2.default, null)
+          ),
+          _preact2.default.h(
+            'section',
+            null,
+            _preact2.default.h(
+              'h2',
+              null,
+              'Type something'
+            ),
+            _preact2.default.h(_Text2.default, null)
+          ),
+          _preact2.default.h(
+            'section',
+            null,
+            _preact2.default.h(
+              'h2',
+              null,
+              'Pan & Zoom'
+            ),
+            _preact2.default.h(_Map2.default, null)
+          ),
+          _preact2.default.h(_Cursor2.default, null)
+        )
+      );
+    }
+  }]);
+
+  return App;
+}(_preact2.default.Component);
+
+exports.default = App;
+
+},{"./Cursor":24,"./Map":25,"./Slider":26,"./Text":27,"preact":12}],24:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _preact = require('preact');
+
+var _preact2 = _interopRequireDefault(_preact);
+
+var _preactRedux = require('preact-redux');
+
+var _cursor = require('../ducks/cursor');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Cursor = function (_preact$Component) {
+  _inherits(Cursor, _preact$Component);
+
+  function Cursor() {
+    _classCallCheck(this, Cursor);
+
+    var _this = _possibleConstructorReturn(this, (Cursor.__proto__ || Object.getPrototypeOf(Cursor)).call(this));
+
+    _this.state = { isHovering: false };
+    return _this;
+  }
+
+  _createClass(Cursor, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      var _this2 = this;
+
+      document.body.addEventListener('mousemove', function (event) {
+        _this2.props.dispatch((0, _cursor.updateCursor)(event.clientX, event.clientY));
+      });
+
+      document.body.addEventListener('mouseenter', function () {
+        _this2.setState({ isHovering: true });
+      });
+
+      document.body.addEventListener('mouseleave', function () {
+        _this2.setState({ isHovering: false });
+      });
+    }
+  }, {
+    key: 'render',
+    value: function render(props, state) {
+      return _preact2.default.h(
+        'div',
+        null,
+        !state.isHovering && _preact2.default.h('div', {
+          style: {
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: 5,
+            height: 5,
+            borderRadius: '50%',
+            backgroundColor: 'rgb(0, 0, 255)',
+            pointerEvents: 'none',
+            transform: 'translate(' + props.x + 'px, ' + props.y + 'px)'
+          }
+        })
+      );
+    }
+  }]);
+
+  return Cursor;
+}(_preact2.default.Component);
+
+exports.default = (0, _preactRedux.connect)(function (_ref) {
+  var cursor = _ref.cursor;
+
+  return {
+    x: cursor.x,
+    y: cursor.y
+  };
+})(Cursor);
+
+},{"../ducks/cursor":28,"preact":12,"preact-redux":11}],25:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _preact = require('preact');
+
+var _preact2 = _interopRequireDefault(_preact);
+
+var _preactRedux = require('preact-redux');
+
+var _map = require('../ducks/map');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var accessToken = 'pk.eyJ1Ijoic2NhcnlzaXplIiwiYSI6ImNpcjR2ZWs4ODAwNDZoc25xMmRzM2JlcnQifQ.XmRVjMqDm9jUWw3eMYrrUw';
+window.mapboxgl.accessToken = accessToken;
+
+var Map = function (_preact$Component) {
+  _inherits(Map, _preact$Component);
+
+  function Map() {
+    _classCallCheck(this, Map);
+
+    return _possibleConstructorReturn(this, (Map.__proto__ || Object.getPrototypeOf(Map)).apply(this, arguments));
+  }
+
+  _createClass(Map, [{
+    key: 'init',
+    value: function init(container) {
+      var _this2 = this;
+
+      if (container && !this.initialized) {
+        this.initialized = true;
+
+        this.map = new mapboxgl.Map({
+          container: container,
+          style: 'mapbox://styles/mapbox/streets-v9',
+          center: this.props.center,
+          zoom: this.props.zoom
+        });
+
+        this.map.on('move', function () {
+          _this2.props.dispatch((0, _map.updateMap)(_this2.map.getCenter(), _this2.map.getZoom()));
+        });
+      }
+    }
+  }, {
+    key: 'componentWillReceiveProps',
+    value: function componentWillReceiveProps(_ref) {
+      var center = _ref.center,
+          zoom = _ref.zoom;
+
+      this.map.setCenter(center);
+      this.map.setZoom(zoom);
+    }
+  }, {
+    key: 'shouldComponentUpdate',
+    value: function shouldComponentUpdate() {
+      if (this.initialized) {
+        return false;
+      }
+
+      return true;
+    }
+  }, {
+    key: 'render',
+    value: function render(props) {
+      var _this3 = this;
+
+      return _preact2.default.h(
+        'div',
+        { style: {
+            position: 'relative',
+            height: 300,
+            width: 300
+          } },
+        _preact2.default.h('div', {
+          className: 'map',
+          ref: function ref(item) {
+            return _this3.init(item);
+          }
+        })
+      );
+    }
+  }]);
+
+  return Map;
+}(_preact2.default.Component);
+
+exports.default = (0, _preactRedux.connect)(function (_ref2) {
+  var map = _ref2.map;
+
+  return {
+    center: map.center,
+    zoom: map.zoom
+  };
+})(Map);
+
+},{"../ducks/map":29,"preact":12,"preact-redux":11}],26:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _preact = require('preact');
+
+var _preact2 = _interopRequireDefault(_preact);
+
+var _preactRedux = require('preact-redux');
+
+var _slider = require('../ducks/slider');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Slider = function (_preact$Component) {
+  _inherits(Slider, _preact$Component);
+
+  function Slider() {
+    _classCallCheck(this, Slider);
+
+    return _possibleConstructorReturn(this, (Slider.__proto__ || Object.getPrototypeOf(Slider)).apply(this, arguments));
+  }
+
+  _createClass(Slider, [{
+    key: 'onChange',
+    value: function onChange(event) {
+      var value = event.target.value;
+
+
+      this.props.dispatch((0, _slider.updateSlider)(value));
+    }
+  }, {
+    key: 'render',
+    value: function render(props) {
+      var _this2 = this;
+
+      return _preact2.default.h(
+        'div',
+        null,
+        _preact2.default.h('input', {
+          max: '100',
+          min: '0',
+          onInput: function onInput(event) {
+            return _this2.onChange(event);
+          },
+          type: 'range',
+          value: props.value
+        }),
+        _preact2.default.h(
+          'div',
+          {
+            style: {
+              textAlign: 'center'
+            }
+          },
+          props.value
+        )
+      );
+    }
+  }]);
+
+  return Slider;
+}(_preact2.default.Component);
+
+exports.default = (0, _preactRedux.connect)(function (_ref) {
+  var slider = _ref.slider;
+
+  return {
+    value: slider
+  };
+})(Slider);
+
+},{"../ducks/slider":30,"preact":12,"preact-redux":11}],27:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _preact = require('preact');
+
+var _preact2 = _interopRequireDefault(_preact);
+
+var _preactRedux = require('preact-redux');
+
+var _text = require('../ducks/text');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Text = function (_preact$Component) {
+  _inherits(Text, _preact$Component);
+
+  function Text() {
+    _classCallCheck(this, Text);
+
+    return _possibleConstructorReturn(this, (Text.__proto__ || Object.getPrototypeOf(Text)).apply(this, arguments));
+  }
+
+  _createClass(Text, [{
+    key: 'onChange',
+    value: function onChange(event) {
+      var value = event.target.value;
+
+
+      this.props.dispatch((0, _text.updateText)(value));
+    }
+  }, {
+    key: 'render',
+    value: function render(props) {
+      var _this2 = this;
+
+      return _preact2.default.h(
+        'div',
+        null,
+        _preact2.default.h('input', {
+          onInput: function onInput(event) {
+            return _this2.onChange(event);
+          },
+          type: 'text',
+          value: props.value
+        })
+      );
+    }
+  }]);
+
+  return Text;
+}(_preact2.default.Component);
+
+exports.default = (0, _preactRedux.connect)(function (_ref) {
+  var text = _ref.text;
+
+  return {
+    value: text
+  };
+})(Text);
+
+},{"../ducks/text":31,"preact":12,"preact-redux":11}],28:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = reducer;
+exports.updateCursor = updateCursor;
+var UPDATE = 'cursor/UPDATE';
+
+var initialState = {};
+
+function reducer() {
+  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
+  var action = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+  if (action.type === UPDATE) {
+    return {
+      x: action.x,
+      y: action.y
+    };
+  }
+
+  return state;
+}
+
+function updateCursor(x, y) {
+  return { type: UPDATE, x: x, y: y };
+}
 
 },{}],29:[function(require,module,exports){
-"use strict";function reducer(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:initialState,t=arguments.length>1&&void 0!==arguments[1]?arguments[1]:{};return t.type===UPDATE?t.value:e}function updateSlider(e){return{type:UPDATE,value:e}}Object.defineProperty(exports,"__esModule",{value:!0}),exports.default=reducer,exports.updateSlider=updateSlider;var UPDATE="slider/UPDATE",initialState=10;
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = reducer;
+exports.updateMap = updateMap;
+var UPDATE = 'map/UPDATE';
+
+var initialState = {
+  center: [29.688329407426636, 51.01026517655359],
+  zoom: 1
+};
+
+function reducer() {
+  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
+  var action = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+  if (action.type === UPDATE) {
+    return Object.assign({}, state, {
+      center: action.center,
+      zoom: action.zoom
+    });
+  }
+
+  return state;
+}
+
+function updateMap(center, zoom) {
+  return { type: UPDATE, center: center, zoom: zoom };
+}
 
 },{}],30:[function(require,module,exports){
-"use strict";function reducer(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:initialState,t=arguments.length>1&&void 0!==arguments[1]?arguments[1]:{};return t.type===UPDATE?t.value:e}function updateText(e){return{type:UPDATE,value:e}}Object.defineProperty(exports,"__esModule",{value:!0}),exports.default=reducer,exports.updateText=updateText;var UPDATE="text/UPDATE",initialState="";
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = reducer;
+exports.updateSlider = updateSlider;
+var UPDATE = 'slider/UPDATE';
+
+var initialState = 10;
+
+function reducer() {
+  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
+  var action = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+  if (action.type === UPDATE) {
+    return action.value;
+  }
+
+  return state;
+}
+
+function updateSlider(value) {
+  return { type: UPDATE, value: value };
+}
 
 },{}],31:[function(require,module,exports){
-"use strict";function _interopRequireDefault(e){return e&&e.__esModule?e:{default:e}}var _preact=require("preact"),_preact2=_interopRequireDefault(_preact),_preactRedux=require("preact-redux"),_App=require("./components/App"),_App2=_interopRequireDefault(_App),_store=require("./store"),_store2=_interopRequireDefault(_store),_middleware=require("./middleware"),container=document.querySelector(".app"),store=(0,_store2.default)(),onStorage=(0,_middleware.createOnStorage)(store);window.addEventListener("storage",onStorage),_preact2.default.render(_preact2.default.h(_preactRedux.Provider,{store:store},_preact2.default.h(_App2.default,null)),container);
+'use strict';
 
-},{"./components/App":24,"./middleware":32,"./store":34,"preact":12,"preact-redux":11}],32:[function(require,module,exports){
-"use strict";function _interopRequireDefault(e){return e&&e.__esModule?e:{default:e}}function wrapAction(e){return{action:e,sourceId:_sourceId2.default,time:Date.now()}}function storageMiddleware(){return function(){return function(e){return function(r){var t=wrapAction(r);localStorage.setItem(storageKey,JSON.stringify(t)),e(r)}}}}function createOnStorage(e){return function(){var r=JSON.parse(localStorage.getItem(storageKey));r.sourceId!==_sourceId2.default&&e.dispatch(r.action)}}Object.defineProperty(exports,"__esModule",{value:!0}),exports.storageMiddleware=storageMiddleware,exports.createOnStorage=createOnStorage;var _sourceId=require("./source-id"),_sourceId2=_interopRequireDefault(_sourceId),storageKey="redux-tab-sync";
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = reducer;
+exports.updateText = updateText;
+var UPDATE = 'text/UPDATE';
 
-},{"./source-id":33}],33:[function(require,module,exports){
-"use strict";Object.defineProperty(exports,"__esModule",{value:!0});var source=Math.floor(1e4*Math.random());exports.default=source;
+var initialState = '';
 
-},{}],34:[function(require,module,exports){
-"use strict";function _interopRequireDefault(e){return e&&e.__esModule?e:{default:e}}Object.defineProperty(exports,"__esModule",{value:!0}),exports.default=function(){var e=(0,_redux.combineReducers)({map:_map2.default,slider:_slider2.default,text:_text2.default});return(0,_redux.createStore)(e,(0,_redux.applyMiddleware)((0,_middleware.storageMiddleware)()))};var _redux=require("redux"),_map=require("./ducks/map"),_map2=_interopRequireDefault(_map),_slider=require("./ducks/slider"),_slider2=_interopRequireDefault(_slider),_text=require("./ducks/text"),_text2=_interopRequireDefault(_text),_middleware=require("./middleware");
+function reducer() {
+  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
+  var action = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-},{"./ducks/map":28,"./ducks/slider":29,"./ducks/text":30,"./middleware":32,"redux":19}]},{},[31]);
+  if (action.type === UPDATE) {
+    return action.value;
+  }
+
+  return state;
+}
+
+function updateText(value) {
+  return { type: UPDATE, value: value };
+}
+
+},{}],32:[function(require,module,exports){
+'use strict';
+
+var _preact = require('preact');
+
+var _preact2 = _interopRequireDefault(_preact);
+
+var _preactRedux = require('preact-redux');
+
+var _App = require('./components/App');
+
+var _App2 = _interopRequireDefault(_App);
+
+var _store = require('./store');
+
+var _store2 = _interopRequireDefault(_store);
+
+var _middleware = require('./middleware');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var container = document.querySelector('.app');
+var store = (0, _store2.default)();
+var onStorage = (0, _middleware.createOnStorage)(store);
+
+// listen to local storage events for new actions
+window.addEventListener('storage', onStorage);
+
+_preact2.default.render(_preact2.default.h(
+  _preactRedux.Provider,
+  { store: store },
+  _preact2.default.h(_App2.default, null)
+), container);
+
+},{"./components/App":23,"./middleware":33,"./store":35,"preact":12,"preact-redux":11}],33:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.storageMiddleware = storageMiddleware;
+exports.createOnStorage = createOnStorage;
+
+var _sourceId = require('./source-id');
+
+var _sourceId2 = _interopRequireDefault(_sourceId);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var storageKey = 'redux-tab-sync';
+
+function wrapAction(action) {
+  return {
+    action: action,
+    sourceId: _sourceId2.default,
+    time: Date.now()
+  };
+}
+
+function storageMiddleware() {
+  return function () {
+    return function (next) {
+      return function (action) {
+        var wrappedAction = wrapAction(action);
+
+        localStorage.setItem(storageKey, JSON.stringify(wrappedAction));
+
+        next(action);
+      };
+    };
+  };
+}
+
+function createOnStorage(store) {
+  return function () {
+    var wrappedAction = JSON.parse(localStorage.getItem(storageKey));
+
+    if (wrappedAction.sourceId !== _sourceId2.default) {
+      store.dispatch(wrappedAction.action);
+    }
+  };
+}
+
+},{"./source-id":34}],34:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var source = Math.floor(Math.random() * 10000);
+
+exports.default = source;
+
+},{}],35:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+exports.default = function () {
+  var reducers = (0, _redux.combineReducers)({
+    cursor: _cursor2.default,
+    map: _map2.default,
+    slider: _slider2.default,
+    text: _text2.default
+  });
+
+  return (0, _redux.createStore)(reducers, (0, _redux.applyMiddleware)((0, _middleware.storageMiddleware)()));
+};
+
+var _redux = require('redux');
+
+var _cursor = require('./ducks/cursor');
+
+var _cursor2 = _interopRequireDefault(_cursor);
+
+var _map = require('./ducks/map');
+
+var _map2 = _interopRequireDefault(_map);
+
+var _slider = require('./ducks/slider');
+
+var _slider2 = _interopRequireDefault(_slider);
+
+var _text = require('./ducks/text');
+
+var _text2 = _interopRequireDefault(_text);
+
+var _middleware = require('./middleware');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+},{"./ducks/cursor":28,"./ducks/map":29,"./ducks/slider":30,"./ducks/text":31,"./middleware":33,"redux":18}],36:[function(require,module,exports){
+// shim for using process in browser
+var process = module.exports = {};
+
+// cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
+
+var cachedSetTimeout;
+var cachedClearTimeout;
+
+function defaultSetTimout() {
+    throw new Error('setTimeout has not been defined');
+}
+function defaultClearTimeout () {
+    throw new Error('clearTimeout has not been defined');
+}
+(function () {
+    try {
+        if (typeof setTimeout === 'function') {
+            cachedSetTimeout = setTimeout;
+        } else {
+            cachedSetTimeout = defaultSetTimout;
+        }
+    } catch (e) {
+        cachedSetTimeout = defaultSetTimout;
+    }
+    try {
+        if (typeof clearTimeout === 'function') {
+            cachedClearTimeout = clearTimeout;
+        } else {
+            cachedClearTimeout = defaultClearTimeout;
+        }
+    } catch (e) {
+        cachedClearTimeout = defaultClearTimeout;
+    }
+} ())
+function runTimeout(fun) {
+    if (cachedSetTimeout === setTimeout) {
+        //normal enviroments in sane situations
+        return setTimeout(fun, 0);
+    }
+    // if setTimeout wasn't available but was latter defined
+    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+        cachedSetTimeout = setTimeout;
+        return setTimeout(fun, 0);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedSetTimeout(fun, 0);
+    } catch(e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+            return cachedSetTimeout.call(null, fun, 0);
+        } catch(e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+            return cachedSetTimeout.call(this, fun, 0);
+        }
+    }
+
+
+}
+function runClearTimeout(marker) {
+    if (cachedClearTimeout === clearTimeout) {
+        //normal enviroments in sane situations
+        return clearTimeout(marker);
+    }
+    // if clearTimeout wasn't available but was latter defined
+    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+        cachedClearTimeout = clearTimeout;
+        return clearTimeout(marker);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedClearTimeout(marker);
+    } catch (e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+            return cachedClearTimeout.call(null, marker);
+        } catch (e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+            return cachedClearTimeout.call(this, marker);
+        }
+    }
+
+
+
+}
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = runTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    runClearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        runTimeout(drainQueue);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+},{}]},{},[32]);

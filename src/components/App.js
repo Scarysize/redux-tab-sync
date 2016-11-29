@@ -1,5 +1,6 @@
 import preact from 'preact';
 
+import Cursor from './Cursor';
 import Map from './Map';
 import Slider from './Slider';
 import Text from './Text';
@@ -34,6 +35,7 @@ export default class App extends preact.Component {
             <h2>Pan & Zoom</h2>
             <Map />
           </section>
+          <Cursor />
         </div>
       </div>
     );
