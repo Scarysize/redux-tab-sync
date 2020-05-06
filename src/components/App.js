@@ -5,7 +5,7 @@ import Map from './Map';
 import Slider from './Slider';
 import Text from './Text';
 
-const article = "https://medium.com/@Scarysize/syncing-redux-stores-across-browser-tabs-fff04f975423#.ipvddmb73";
+const article = "https://franz.hamburg/writing/syncing-redux-stores-across-browser-tabs.html";
 
 export default class App extends preact.Component {
   render() {
